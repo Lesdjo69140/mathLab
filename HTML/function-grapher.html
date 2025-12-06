@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>GraphLab Pro | Grapheur de Fonctions Mathématiques</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-hover: #334155;
+            --input-bg: rgba(15, 23, 42, 0.7);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+            --gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-label .info {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+
+        .function-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: var(--transition);
+        }
+
+        .function-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .range-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .range-input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Function List */
+        .function-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .function-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .function-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+        }
+
+        .function-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--primary);
+        }
+
+        .function-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .function-expression {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .function-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Graph Container */
+        .graph-container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mode-selector {
+            display: flex;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            padding: 5px;
+            gap: 5px;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .graph-tools {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tool-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+        }
+
+        .graph-area {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #graph2D, #graph3D {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .analysis-panel.visible {
+            display: block;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .analysis-item {
+            padding: 15px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .analysis-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .analysis-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .graph-controls {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .mode-selector {
+                justify-content: center;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-function"></i>
+                GraphLab Pro
+            </div>
+            <p class="subtitle">
+                Tracez et analysez des fonctions mathématiques en 2D et 3D avec visualisation interactive
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Function Input Card -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-edit"></i>
+                        Entrée de fonction
+                    </h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-square-root-alt"></i>
+                            Fonction f(x) =
+                            <span class="info">Utilisez x comme variable</span>
+                        </label>
+                        <input type="text" 
+                               class="function-input" 
+                               id="functionInput" 
+                               placeholder="Ex: sin(x) + x^2 - 3"
+                               value="sin(x)">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler"></i>
+                            Intervalle de x
+                        </label>
+                        <div class="range-inputs">
+                            <input type="number" class="range-input" id="xMin" value="-10" step="0.5">
+                            <input type="number" class="range-input" id="xMax" value="10" step="0.5">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler-vertical"></i>
+                            Intervalle de y
+                        </label>
+                        <div class="range-inputs">
+                            <input type="number" class="range-input" id="yMin" value="-5" step="0.5">
+                            <input type="number" class="range-input" id="yMax" value="5" step="0.5">
+                        </div>
+                    </div>
+                    
+                    <div class="buttons-grid">
+                        <button class="btn btn-primary" id="plotBtn">
+                            <i class="fas fa-chart-line"></i>
+                            Tracer
+                        </button>
+                        <button class="btn btn-success" id="addFunctionBtn">
+                            <i class="fas fa-plus"></i>
+                            Ajouter
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn">
+                            <i class="fas fa-trash"></i>
+                            Effacer
+                        </button>
+                        <button class="btn btn-secondary" id="exampleBtn">
+                            <i class="fas fa-list-ol"></i>
+                            Exemples
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Functions List Card -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-list"></i>
+                        Fonctions actives
+                    </h2>
+                    
+                    <div class="function-list" id="functionList">
+                        <!-- Functions will be added here -->
+                    </div>
+                </div>
+
+                <!-- Analysis Card -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Outils d'analyse
+                    </h2>
+                    
+                    <div class="buttons-grid">
+                        <button class="btn btn-secondary" id="analyzeBtn">
+                            <i class="fas fa-search"></i>
+                            Analyser
+                        </button>
+                        <button class="btn btn-secondary" id="derivativeBtn">
+                            <i class="fas fa-sliders-h"></i>
+                            Dérivée
+                        </button>
+                        <button class="btn btn-secondary" id="integralBtn">
+                            <i class="fas fa-integral"></i>
+                            Intégrale
+                        </button>
+                        <button class="btn btn-secondary" id="rootsBtn">
+                            <i class="fas fa-crosshairs"></i>
+                            Racines
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Container -->
+            <div class="graph-container">
+                <div class="graph-controls">
+                    <div class="mode-selector">
+                        <button class="mode-btn active" data-mode="2D">2D</button>
+                        <button class="mode-btn" data-mode="3D">3D</button>
+                        <button class="mode-btn" data-mode="polar">Polaire</button>
+                        <button class="mode-btn" data-mode="parametric">Paramétrique</button>
+                    </div>
+                    
+                    <div class="graph-tools">
+                        <button class="tool-btn" id="zoomInBtn">
+                            <i class="fas fa-search-plus"></i>
+                            Zoom +
+                        </button>
+                        <button class="tool-btn" id="zoomOutBtn">
+                            <i class="fas fa-search-minus"></i>
+                            Zoom -
+                        </button>
+                        <button class="tool-btn" id="resetViewBtn">
+                            <i class="fas fa-expand-alt"></i>
+                            Réinitialiser
+                        </button>
+                        <button class="tool-btn" id="gridToggleBtn">
+                            <i class="fas fa-th"></i>
+                            Grille
+                        </button>
+                        <button class="tool-btn" id="exportBtn">
+                            <i class="fas fa-download"></i>
+                            Exporter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="graph-area">
+                    <div id="graph2D"></div>
+                    <div id="graph3D" style="display: none;"></div>
+                </div>
+                
+                <!-- Analysis Panel -->
+                <div class="analysis-panel" id="analysisPanel">
+                    <div class="analysis-grid" id="analysisGrid">
+                        <!-- Analysis results will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 GraphLab Pro • Grapheur de fonctions mathématiques avancé</p>
+            <p>Supporte : fonctions trigonométriques, exponentielles, logarithmiques, polynomiales</p>
+        </footer>
+    </div>
+
+    <script>
+        class FunctionGrapher {
+            constructor() {
+                this.functions = [];
+                this.activeFunctions = [];
+                this.currentMode = '2D';
+                this.plotData = [];
+                this.graph2D = null;
+                this.graph3D = null;
+                this.xRange = [-10, 10];
+                this.yRange = [-5, 5];
+                this.zRange = [-5, 5];
+                this.colors = [
+                    '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', 
+                    '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.initGraphs();
+                this.loadExamples();
+                this.updateFunctionList();
+            }
+            
+            bindEvents() {
+                // Mode selector
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const mode = btn.dataset.mode;
+                        this.setMode(mode, btn);
+                    });
+                });
+                
+                // Plot button
+                document.getElementById('plotBtn').addEventListener('click', () => {
+                    this.plotFunction();
+                });
+                
+                // Add function button
+                document.getElementById('addFunctionBtn').addEventListener('click', () => {
+                    this.addFunction();
+                });
+                
+                // Clear button
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearAll();
+                });
+                
+                // Example button
+                document.getElementById('exampleBtn').addEventListener('click', () => {
+                    this.showExamples();
+                });
+                
+                // Analysis buttons
+                document.getElementById('analyzeBtn').addEventListener('click', () => {
+                    this.analyzeFunction();
+                });
+                
+                document.getElementById('derivativeBtn').addEventListener('click', () => {
+                    this.calculateDerivative();
+                });
+                
+                document.getElementById('integralBtn').addEventListener('click', () => {
+                    this.calculateIntegral();
+                });
+                
+                document.getElementById('rootsBtn').addEventListener('click', () => {
+                    this.findRoots();
+                });
+                
+                // Graph tools
+                document.getElementById('zoomInBtn').addEventListener('click', () => {
+                    this.zoomIn();
+                });
+                
+                document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                    this.zoomOut();
+                });
+                
+                document.getElementById('resetViewBtn').addEventListener('click', () => {
+                    this.resetView();
+                });
+                
+                document.getElementById('gridToggleBtn').addEventListener('click', (e) => {
+                    this.toggleGrid(e.target);
+                });
+                
+                document.getElementById('exportBtn').addEventListener('click', () => {
+                    this.exportGraph();
+                });
+                
+                // Range inputs
+                document.getElementById('xMin').addEventListener('change', () => {
+                    this.xRange[0] = parseFloat(document.getElementById('xMin').value);
+                });
+                
+                document.getElementById('xMax').addEventListener('change', () => {
+                    this.xRange[1] = parseFloat(document.getElementById('xMax').value);
+                });
+                
+                document.getElementById('yMin').addEventListener('change', () => {
+                    this.yRange[0] = parseFloat(document.getElementById('yMin').value);
+                });
+                
+                document.getElementById('yMax').addEventListener('change', () => {
+                    this.yRange[1] = parseFloat(document.getElementById('yMax').value);
+                });
+                
+                // Enter key for input
+                document.getElementById('functionInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.plotFunction();
+                    }
+                });
+            }
+            
+            initGraphs() {
+                // Initialize 2D graph
+                const layout2D = {
+                    title: 'Graphique 2D',
+                    xaxis: {
+                        title: 'x',
+                        range: this.xRange,
+                        showgrid: true,
+                        gridcolor: 'rgba(255,255,255,0.1)',
+                        zerolinecolor: 'rgba(255,255,255,0.3)'
+                    },
+                    yaxis: {
+                        title: 'f(x)',
+                        range: this.yRange,
+                        showgrid: true,
+                        gridcolor: 'rgba(255,255,255,0.1)',
+                        zerolinecolor: 'rgba(255,255,255,0.3)'
+                    },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    font: { color: '#f1f5f9' },
+                    margin: { t: 40, r: 20, b: 40, l: 50 },
+                    showlegend: true,
+                    legend: { x: 1, y: 1, xanchor: 'right', yanchor: 'top' }
+                };
+                
+                this.graph2D = document.getElementById('graph2D');
+                Plotly.newPlot(this.graph2D, [], layout2D, {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['sendDataToCloud', 'autoScale2d', 'resetScale2d'],
+                    modeBarButtonsToAdd: []
+                });
+                
+                // Initialize 3D graph
+                const layout3D = {
+                    title: 'Graphique 3D',
+                    scene: {
+                        xaxis: {
+                            title: 'x',
+                            range: this.xRange,
+                            backgroundcolor: 'rgba(0,0,0,0)',
+                            gridcolor: 'rgba(255,255,255,0.1)'
+                        },
+                        yaxis: {
+                            title: 'y',
+                            range: this.yRange,
+                            backgroundcolor: 'rgba(0,0,0,0)',
+                            gridcolor: 'rgba(255,255,255,0.1)'
+                        },
+                        zaxis: {
+                            title: 'f(x,y)',
+                            range: this.zRange,
+                            backgroundcolor: 'rgba(0,0,0,0)',
+                            gridcolor: 'rgba(255,255,255,0.1)'
+                        },
+                        camera: {
+                            eye: { x: 1.5, y: 1.5, z: 1.5 }
+                        }
+                    },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    font: { color: '#f1f5f9' },
+                    margin: { t: 40, r: 20, b: 20, l: 20 }
+                };
+                
+                this.graph3D = document.getElementById('graph3D');
+                Plotly.newPlot(this.graph3D, [], layout3D, {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false
+                });
+            }
+            
+            setMode(mode, button) {
+                // Update active button
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                
+                // Update UI based on mode
+                this.currentMode = mode;
+                
+                // Show/hide appropriate graph
+                if (mode === '2D' || mode === 'polar') {
+                    document.getElementById('graph2D').style.display = 'block';
+                    document.getElementById('graph3D').style.display = 'none';
+                } else if (mode === '3D') {
+                    document.getElementById('graph2D').style.display = 'none';
+                    document.getElementById('graph3D').style.display = 'block';
+                }
+                
+                // Update input placeholder
+                const input = document.getElementById('functionInput');
+                switch(mode) {
+                    case '2D':
+                        input.placeholder = 'Ex: sin(x) + x^2 - 3';
+                        break;
+                    case '3D':
+                        input.placeholder = 'Ex: sin(x) + cos(y)';
+                        break;
+                    case 'polar':
+                        input.placeholder = 'Ex: 2*cos(theta)';
+                        break;
+                    case 'parametric':
+                        input.placeholder = 'Ex: [cos(t), sin(t)]';
+                        break;
+                }
+            }
+            
+            parseFunction(expression) {
+                try {
+                    // Replace common math notations
+                    let parsed = expression
+                        .replace(/pi/g, 'Math.PI')
+                        .replace(/e/g, 'Math.E')
+                        .replace(/sin\(/g, 'Math.sin(')
+                        .replace(/cos\(/g, 'Math.cos(')
+                        .replace(/tan\(/g, 'Math.tan(')
+                        .replace(/asin\(/g, 'Math.asin(')
+                        .replace(/acos\(/g, 'Math.acos(')
+                        .replace(/atan\(/g, 'Math.atan(')
+                        .replace(/sqrt\(/g, 'Math.sqrt(')
+                        .replace(/log\(/g, 'Math.log10(')
+                        .replace(/ln\(/g, 'Math.log(')
+                        .replace(/exp\(/g, 'Math.exp(')
+                        .replace(/abs\(/g, 'Math.abs(')
+                        .replace(/\^/g, '**');
+                    
+                    return parsed;
+                } catch (error) {
+                    throw new Error('Erreur de syntaxe dans la fonction');
+                }
+            }
+            
+            evaluateFunction(expression, x, y = null) {
+                try {
+                    const parsed = this.parseFunction(expression);
+                    let func;
+                    
+                    if (this.currentMode === '3D') {
+                        func = new Function('x', 'y', `return ${parsed}`);
+                        return func(x, y);
+                    } else {
+                        func = new Function('x', `return ${parsed}`);
+                        return func(x);
+                    }
+                } catch (error) {
+                    console.error('Erreur d\'évaluation:', error);
+                    return NaN;
+                }
+            }
+            
+            plotFunction() {
+                const expression = document.getElementById('functionInput').value.trim();
+                if (!expression) return;
+                
+                // Generate data points
+                const step = (this.xRange[1] - this.xRange[0]) / 500;
+                const xValues = [];
+                const yValues = [];
+                
+                for (let x = this.xRange[0]; x <= this.xRange[1]; x += step) {
+                    try {
+                        const y = this.evaluateFunction(expression, x);
+                        if (!isNaN(y) && isFinite(y)) {
+                            xValues.push(x);
+                            yValues.push(y);
+                        }
+                    } catch (error) {
+                        // Skip invalid points
+                    }
+                }
+                
+                if (xValues.length === 0) {
+                    this.showNotification('Aucune donnée valide à tracer', 'error');
+                    return;
+                }
+                
+                // Choose color for this function
+                const color = this.colors[this.functions.length % this.colors.length];
+                
+                // Add to functions list
+                const functionId = Date.now();
+                this.functions.push({
+                    id: functionId,
+                    expression: expression,
+                    color: color,
+                    data: { x: xValues, y: yValues }
+                });
+                
+                this.activeFunctions.push(functionId);
+                this.updateFunctionList();
+                this.updateGraph();
+                this.showNotification('Fonction tracée avec succès', 'success');
+            }
+            
+            addFunction() {
+                const expression = document.getElementById('functionInput').value.trim();
+                if (!expression) return;
+                
+                // Check if function already exists
+                const exists = this.functions.find(f => f.expression === expression);
+                if (exists) {
+                    this.showNotification('Cette fonction existe déjà', 'warning');
+                    return;
+                }
+                
+                this.plotFunction();
+            }
+            
+            updateFunctionList() {
+                const list = document.getElementById('functionList');
+                list.innerHTML = '';
+                
+                this.functions.forEach((func, index) => {
+                    const isActive = this.activeFunctions.includes(func.id);
+                    const item = document.createElement('div');
+                    item.className = `function-item ${isActive ? 'active' : ''}`;
+                    item.dataset.id = func.id;
+                    
+                    item.innerHTML = `
+                        <div class="function-color" style="background: ${func.color}"></div>
+                        <div class="function-expression">${func.expression}</div>
+                        <div class="function-actions">
+                            <button class="tool-btn" style="padding: 4px 8px;" onclick="grapher.toggleFunction(${func.id})">
+                                <i class="fas fa-${isActive ? 'eye' : 'eye-slash'}"></i>
+                            </button>
+                            <button class="tool-btn" style="padding: 4px 8px; background: var(--danger);" onclick="grapher.removeFunction(${func.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    list.appendChild(item);
+                });
+            }
+            
+            toggleFunction(id) {
+                const index = this.activeFunctions.indexOf(id);
+                if (index > -1) {
+                    this.activeFunctions.splice(index, 1);
+                } else {
+                    this.activeFunctions.push(id);
+                }
+                this.updateFunctionList();
+                this.updateGraph();
+            }
+            
+            removeFunction(id) {
+                this.functions = this.functions.filter(f => f.id !== id);
+                this.activeFunctions = this.activeFunctions.filter(fid => fid !== id);
+                this.updateFunctionList();
+                this.updateGraph();
+            }
+            
+            updateGraph() {
+                const activeFuncs = this.functions.filter(f => 
+                    this.activeFunctions.includes(f.id)
+                );
+                
+                if (this.currentMode === '2D') {
+                    this.update2DGraph(activeFuncs);
+                } else if (this.currentMode === '3D') {
+                    this.update3DGraph(activeFuncs);
+                }
+            }
+            
+            update2DGraph(functions) {
+                const traces = functions.map(func => ({
+                    x: func.data.x,
+                    y: func.data.y,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: func.expression,
+                    line: {
+                        color: func.color,
+                        width: 3
+                    }
+                }));
+                
+                const layout = {
+                    xaxis: { range: this.xRange, title: 'x' },
+                    yaxis: { range: this.yRange, title: 'f(x)' }
+                };
+                
+                Plotly.react(this.graph2D, traces, layout);
+            }
+            
+            update3DGraph(functions) {
+                if (functions.length === 0) return;
+                
+                // For 3D, we'll plot the first function
+                const func = functions[0];
+                
+                // Generate grid data
+                const size = 50;
+                const x = [];
+                const y = [];
+                const z = [];
+                
+                for (let i = 0; i < size; i++) {
+                    x[i] = [];
+                    y[i] = [];
+                    z[i] = [];
+                    
+                    for (let j = 0; j < size; j++) {
+                        const xi = this.xRange[0] + (this.xRange[1] - this.xRange[0]) * i / (size - 1);
+                        const yi = this.yRange[0] + (this.yRange[1] - this.yRange[0]) * j / (size - 1);
+                        
+                        x[i][j] = xi;
+                        y[i][j] = yi;
+                        z[i][j] = this.evaluateFunction(func.expression, xi, yi);
+                    }
+                }
+                
+                const trace = {
+                    x: x.flat(),
+                    y: y.flat(),
+                    z: z.flat(),
+                    type: 'surface',
+                    colorscale: 'Viridis',
+                    opacity: 0.8
+                };
+                
+                Plotly.react(this.graph3D, [trace]);
+            }
+            
+            clearAll() {
+                this.functions = [];
+                this.activeFunctions = [];
+                this.updateFunctionList();
+                this.updateGraph();
+                this.showNotification('Toutes les fonctions ont été effacées', 'info');
+            }
+            
+            loadExamples() {
+                // Predefined example functions
+                this.examples = [
+                    { expression: 'sin(x)', label: 'Sinus' },
+                    { expression: 'cos(x)', label: 'Cosinus' },
+                    { expression: 'x^2', label: 'Parabole' },
+                    { expression: 'exp(-x^2)', label: 'Gaussienne' },
+                    { expression: 'log(x+1)', label: 'Logarithme' },
+                    { expression: '1/x', label: 'Hyperbole' },
+                    { expression: 'sin(x)/x', label: 'Sinc' },
+                    { expression: 'tan(x)', label: 'Tangente' }
+                ];
+            }
+            
+            showExamples() {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    backdrop-filter: blur(5px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+                
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    background: var(--card-bg);
+                    padding: 30px;
+                    border-radius: var(--radius);
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                `;
+                
+                let html = '<h2 style="margin-bottom: 20px;">Exemples de fonctions</h2>';
+                html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">';
+                
+                this.examples.forEach(example => {
+                    html += `
+                        <div class="function-item" 
+                             onclick="grapher.loadExample('${example.expression}')"
+                             style="cursor: pointer;">
+                            <div class="function-expression">${example.expression}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                                ${example.label}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                html += '<button onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>';
+                
+                content.innerHTML = html;
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+            }
+            
+            loadExample(expression) {
+                document.getElementById('functionInput').value = expression;
+                this.plotFunction();
+                document.querySelector('[style*="position: fixed"]')?.remove();
+            }
+            
+            analyzeFunction() {
+                if (this.functions.length === 0) return;
+                
+                const func = this.functions[this.functions.length - 1];
+                const data = func.data;
+                
+                // Calculate statistics
+                const stats = {
+                    min: Math.min(...data.y),
+                    max: Math.max(...data.y),
+                    avg: data.y.reduce((a, b) => a + b, 0) / data.y.length,
+                    // Find approximate roots
+                    roots: this.findRootsApprox(data.x, data.y),
+                    // Find local extrema
+                    extrema: this.findExtrema(data.x, data.y)
+                };
+                
+                // Show analysis panel
+                const panel = document.getElementById('analysisPanel');
+                const grid = document.getElementById('analysisGrid');
+                
+                grid.innerHTML = `
+                    <div class="analysis-item">
+                        <div class="analysis-label">Minimum</div>
+                        <div class="analysis-value">${stats.min.toFixed(4)}</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-label">Maximum</div>
+                        <div class="analysis-value">${stats.max.toFixed(4)}</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-label">Moyenne</div>
+                        <div class="analysis-value">${stats.avg.toFixed(4)}</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-label">Racines (approx)</div>
+                        <div class="analysis-value">${stats.roots.length}</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-label">Extrema</div>
+                        <div class="analysis-value">${stats.extrema.length}</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-label">Points</div>
+                        <div class="analysis-value">${data.x.length}</div>
+                    </div>
+                `;
+                
+                panel.classList.add('visible');
+                panel.classList.add('fade-in');
+            }
+            
+            findRootsApprox(xValues, yValues) {
+                const roots = [];
+                for (let i = 1; i < yValues.length; i++) {
+                    if (yValues[i-1] * yValues[i] < 0) {
+                        // Sign change found, approximate root
+                        const root = (xValues[i-1] + xValues[i]) / 2;
+                        roots.push(root);
+                    }
+                }
+                return roots;
+            }
+            
+            findExtrema(xValues, yValues) {
+                const extrema = [];
+                for (let i = 1; i < yValues.length - 1; i++) {
+                    if ((yValues[i] > yValues[i-1] && yValues[i] > yValues[i+1]) ||
+                        (yValues[i] < yValues[i-1] && yValues[i] < yValues[i+1])) {
+                        extrema.push({ x: xValues[i], y: yValues[i] });
+                    }
+                }
+                return extrema;
+            }
+            
+            calculateDerivative() {
+                if (this.functions.length === 0) return;
+                
+                const func = this.functions[this.functions.length - 1];
+                const h = 0.001; // Small step for numerical derivative
+                
+                // Calculate derivative points
+                const xValues = func.data.x;
+                const yValues = [];
+                
+                for (let i = 0; i < xValues.length; i++) {
+                    const x = xValues[i];
+                    const f_x_plus_h = this.evaluateFunction(func.expression, x + h);
+                    const f_x_minus_h = this.evaluateFunction(func.expression, x - h);
+                    
+                    // Central difference formula
+                    if (!isNaN(f_x_plus_h) && !isNaN(f_x_minus_h)) {
+                        yValues.push((f_x_plus_h - f_x_minus_h) / (2 * h));
+                    } else {
+                        yValues.push(NaN);
+                    }
+                }
+                
+                // Add derivative as new function
+                const derivativeExpr = `d/dx(${func.expression})`;
+                const color = '#f59e0b'; // Orange for derivatives
+                const functionId = Date.now();
+                
+                this.functions.push({
+                    id: functionId,
+                    expression: derivativeExpr,
+                    color: color,
+                    data: { x: xValues, y: yValues }
+                });
+                
+                this.activeFunctions.push(functionId);
+                this.updateFunctionList();
+                this.updateGraph();
+                
+                this.showNotification('Dérivée calculée', 'success');
+            }
+            
+            calculateIntegral() {
+                if (this.functions.length === 0) return;
+                
+                const func = this.functions[this.functions.length - 1];
+                const xValues = func.data.x;
+                const yValues = func.data.y;
+                
+                // Calculate cumulative integral using trapezoidal rule
+                const integralValues = [0];
+                let total = 0;
+                
+                for (let i = 1; i < xValues.length; i++) {
+                    if (!isNaN(yValues[i]) && !isNaN(yValues[i-1])) {
+                        const dx = xValues[i] - xValues[i-1];
+                        const avgY = (yValues[i] + yValues[i-1]) / 2;
+                        total += avgY * dx;
+                        integralValues.push(total);
+                    } else {
+                        integralValues.push(NaN);
+                    }
+                }
+                
+                // Add integral as new function
+                const integralExpr = `∫(${func.expression})dx`;
+                const color = '#10b981'; // Green for integrals
+                const functionId = Date.now();
+                
+                this.functions.push({
+                    id: functionId,
+                    expression: integralExpr,
+                    color: color,
+                    data: { x: xValues, y: integralValues }
+                });
+                
+                this.activeFunctions.push(functionId);
+                this.updateFunctionList();
+                this.updateGraph();
+                
+                this.showNotification('Intégrale calculée', 'success');
+            }
+            
+            findRoots() {
+                if (this.functions.length === 0) return;
+                
+                const func = this.functions[this.functions.length - 1];
+                const roots = this.findRootsApprox(func.data.x, func.data.y);
+                
+                let message = `Racines trouvées (approximatives):\n`;
+                roots.slice(0, 10).forEach((root, i) => {
+                    message += `${i+1}. x ≈ ${root.toFixed(4)}\n`;
+                });
+                
+                if (roots.length > 10) {
+                    message += `\n... et ${roots.length - 10} autres`;
+                }
+                
+                if (roots.length === 0) {
+                    message = 'Aucune racine trouvée dans l\'intervalle';
+                }
+                
+                this.showNotification(message, 'info');
+            }
+            
+            zoomIn() {
+                this.xRange = [this.xRange[0] * 0.9, this.xRange[1] * 0.9];
+                this.yRange = [this.yRange[0] * 0.9, this.yRange[1] * 0.9];
+                
+                document.getElementById('xMin').value = this.xRange[0];
+                document.getElementById('xMax').value = this.xRange[1];
+                document.getElementById('yMin').value = this.yRange[0];
+                document.getElementById('yMax').value = this.yRange[1];
+                
+                this.updateGraph();
+            }
+            
+            zoomOut() {
+                this.xRange = [this.xRange[0] * 1.1, this.xRange[1] * 1.1];
+                this.yRange = [this.yRange[0] * 1.1, this.yRange[1] * 1.1];
+                
+                document.getElementById('xMin').value = this.xRange[0];
+                document.getElementById('xMax').value = this.xRange[1];
+                document.getElementById('yMin').value = this.yRange[0];
+                document.getElementById('yMax').value = this.yRange[1];
+                
+                this.updateGraph();
+            }
+            
+            resetView() {
+                this.xRange = [-10, 10];
+                this.yRange = [-5, 5];
+                
+                document.getElementById('xMin').value = this.xRange[0];
+                document.getElementById('xMax').value = this.xRange[1];
+                document.getElementById('yMin').value = this.yRange[0];
+                document.getElementById('yMax').value = this.yRange[1];
+                
+                this.updateGraph();
+            }
+            
+            toggleGrid(button) {
+                const hasGrid = button.classList.toggle('active');
+                const icon = button.querySelector('i');
+                
+                if (hasGrid) {
+                    icon.className = 'fas fa-th-large';
+                    button.innerHTML = '<i class="fas fa-th-large"></i> Grille';
+                } else {
+                    icon.className = 'fas fa-th';
+                    button.innerHTML = '<i class="fas fa-th"></i> Grille';
+                }
+                
+                // In a real implementation, you would update the plot layout
+                this.showNotification('Option grille à venir', 'info');
+            }
+            
+            exportGraph() {
+                let imageData;
+                
+                if (this.currentMode === '2D') {
+                    Plotly.toImage(this.graph2D, {
+                        format: 'png',
+                        width: 1200,
+                        height: 800
+                    }).then(imgData => {
+                        this.downloadImage(imgData, 'graph2d.png');
+                    });
+                } else {
+                    Plotly.toImage(this.graph3D, {
+                        format: 'png',
+                        width: 1200,
+                        height: 800
+                    }).then(imgData => {
+                        this.downloadImage(imgData, 'graph3d.png');
+                    });
+                }
+            }
+            
+            downloadImage(data, filename) {
+                const link = document.createElement('a');
+                link.href = data;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: ${type === 'error' ? 'var(--danger)' : 
+                               type === 'success' ? 'var(--secondary)' : 
+                               type === 'warning' ? 'var(--warning)' : 'var(--primary)'};
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: var(--shadow-lg);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                    max-width: 400px;
+                    word-wrap: break-word;
+                    white-space: pre-line;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+                
+                // Add CSS animations
+                if (!document.getElementById('notification-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'notification-styles';
+                    style.textContent = `
+                        @keyframes slideIn {
+                            from { transform: translateX(100%); opacity: 0; }
+                            to { transform: translateX(0); opacity: 1; }
+                        }
+                        @keyframes slideOut {
+                            from { transform: translateX(0); opacity: 1; }
+                            to { transform: translateX(100%); opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+        }
+        
+        // Initialize grapher
+        let grapher;
+        document.addEventListener('DOMContentLoaded', () => {
+            grapher = new FunctionGrapher();
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    grapher.plotFunction();
+                }
+                if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    grapher.calculateDerivative();
+                }
+                if (e.ctrlKey && e.key === 'i') {
+                    e.preventDefault();
+                    grapher.calculateIntegral();
+                }
+                if (e.key === 'Escape') {
+                    document.getElementById('analysisPanel').classList.remove('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>GeoLab Pro | Géométrie Interactive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-hover: #334155;
+            --canvas-bg: #0f172a;
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+            --gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                height: auto;
+            }
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            font-size: 2.3rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Tools Panel */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tool-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-primary);
+            font-size: 0.8rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .tool-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tool-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Shapes List */
+        .shapes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .shape-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .shape-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+        }
+
+        .shape-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--primary);
+        }
+
+        .shape-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .shape-info {
+            flex: 1;
+        }
+
+        .shape-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .shape-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .shape-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: relative;
+            background: var(--canvas-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+        }
+
+        #geometryCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .canvas-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .canvas-info {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .canvas-tools {
+            display: flex;
+            gap: 10px;
+            pointer-events: all;
+        }
+
+        .canvas-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Properties Panel */
+        .properties-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .property-group {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .property-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .property-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .property-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .property-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.7);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 2px;
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .color-picker input {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .property-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: rgba(15, 23, 42, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Measurements */
+        .measurements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .measurement-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .measurement-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .measurement-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Buttons */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        /* Presets Grid */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .preset-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .preset-btn i {
+            font-size: 1.5rem;
+        }
+
+        .preset-name {
+            font-size: 0.8rem;
+        }
+
+        /* Footer */
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 300px auto;
+                gap: 15px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .presets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-geometry"></i>
+                GeoLab Pro
+            </div>
+            <p class="subtitle">
+                Géométrie interactive : créez, manipulez et mesurez des figures géométriques
+            </p>
+        </header>
+
+        <!-- Tools Panel -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-tools"></i>
+                Outils
+            </h2>
+            
+            <div class="tools-grid">
+                <div class="tool-btn active" data-tool="select">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Sélection
+                </div>
+                <div class="tool-btn" data-tool="point">
+                    <i class="fas fa-circle"></i>
+                    Point
+                </div>
+                <div class="tool-btn" data-tool="line">
+                    <i class="fas fa-slash"></i>
+                    Segment
+                </div>
+                <div class="tool-btn" data-tool="circle">
+                    <i class="fas fa-circle"></i>
+                    Cercle
+                </div>
+                <div class="tool-btn" data-tool="triangle">
+                    <i class="fas fa-shapes"></i>
+                    Triangle
+                </div>
+                <div class="tool-btn" data-tool="rectangle">
+                    <i class="fas fa-square"></i>
+                    Rectangle
+                </div>
+                <div class="tool-btn" data-tool="polygon">
+                    <i class="fas fa-draw-polygon"></i>
+                    Polygone
+                </div>
+                <div class="tool-btn" data-tool="measure">
+                    <i class="fas fa-ruler"></i>
+                    Mesure
+                </div>
+                <div class="tool-btn" data-tool="transform">
+                    <i class="fas fa-arrows-alt"></i>
+                    Transformation
+                </div>
+            </div>
+
+            <h3 class="card-title" style="margin-top: 30px; font-size: 1.1rem;">
+                <i class="fas fa-th-large"></i>
+                Préréglages
+            </h3>
+            
+            <div class="presets-grid">
+                <div class="preset-btn" data-preset="pythagoras">
+                    <i class="fas fa-square-root-alt"></i>
+                    <span class="preset-name">Théorème de Pythagore</span>
+                </div>
+                <div class="preset-btn" data-preset="triangle">
+                    <i class="fas fa-shapes"></i>
+                    <span class="preset-name">Triangle Équilatéral</span>
+                </div>
+                <div class="preset-btn" data-preset="circle">
+                    <i class="fas fa-circle"></i>
+                    <span class="preset-name">Cercle Unitaire</span>
+                </div>
+                <div class="preset-btn" data-preset="polygon">
+                    <i class="fas fa-hexagon"></i>
+                    <span class="preset-name">Polygone Régulier</span>
+                </div>
+                <div class="preset-btn" data-preset="grid">
+                    <i class="fas fa-th"></i>
+                    <span class="preset-name">Grille</span>
+                </div>
+                <div class="preset-btn" data-preset="axes">
+                    <i class="fas fa-crosshairs"></i>
+                    <span class="preset-name">Axes</span>
+                </div>
+            </div>
+
+            <div class="buttons-grid">
+                <button class="btn btn-success" id="clearBtn">
+                    <i class="fas fa-trash"></i>
+                    Effacer tout
+                </button>
+                <button class="btn btn-secondary" id="gridToggle">
+                    <i class="fas fa-th"></i>
+                    Grille
+                </button>
+                <button class="btn btn-secondary" id="snapToggle">
+                    <i class="fas fa-magnet"></i>
+                    Magnétisme
+                </button>
+                <button class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    Exporter
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <canvas id="geometryCanvas" width="800" height="600"></canvas>
+            
+            <div class="canvas-overlay">
+                <div class="canvas-info" id="canvasInfo">
+                    <i class="fas fa-info-circle"></i>
+                    Mode: <span id="currentMode">Sélection</span> | 
+                    Formes: <span id="shapesCount">0</span>
+                </div>
+                
+                <div class="canvas-tools">
+                    <button class="canvas-btn" id="zoomInBtn" title="Zoom avant">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="canvas-btn" id="zoomOutBtn" title="Zoom arrière">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="canvas-btn" id="resetViewBtn" title="Réinitialiser la vue">
+                        <i class="fas fa-expand-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-sliders-h"></i>
+                Propriétés
+            </h2>
+            
+            <div class="properties-grid">
+                <div class="property-group">
+                    <div class="property-title">
+                        <i class="fas fa-palette"></i>
+                        Apparence
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Couleur:</span>
+                        <div class="color-picker" title="Choisir une couleur">
+                            <input type="color" id="colorPicker" value="#3b82f6">
+                            <div style="width: 100%; height: 100%; border-radius: 6px; background: #3b82f6;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Épaisseur:</span>
+                        <input type="range" id="lineWidth" class="property-input" min="1" max="10" value="2">
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Style:</span>
+                        <select id="lineStyle" class="property-input">
+                            <option value="solid">Continue</option>
+                            <option value="dashed">Tirets</option>
+                            <option value="dotted">Pointillés</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="property-group">
+                    <div class="property-title">
+                        <i class="fas fa-ruler"></i>
+                        Dimensions
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Longueur:</span>
+                        <span class="property-value" id="lengthValue">0.00</span>
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Angle:</span>
+                        <span class="property-value" id="angleValue">0.00°</span>
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Aire:</span>
+                        <span class="property-value" id="areaValue">0.00</span>
+                    </div>
+                    
+                    <div class="property-row">
+                        <span class="property-label">Périmètre:</span>
+                        <span class="property-value" id="perimeterValue">0.00</span>
+                    </div>
+                </div>
+
+                <div class="property-group">
+                    <div class="property-title">
+                        <i class="fas fa-shapes"></i>
+                        Formes actives
+                    </div>
+                    
+                    <div class="shapes-list" id="shapesList">
+                        <!-- Shapes will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 GeoLab Pro • Géométrie interactive avancée</p>
+            <p>Utilisez Ctrl+Z pour annuler, Ctrl+Y pour rétablir</p>
+        </footer>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Exporter la scène</h3>
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 10px; color: var(--text-secondary);">
+                    Format d'exportation:
+                </label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" id="exportPNG">
+                        <i class="fas fa-image"></i> PNG
+                    </button>
+                    <button class="btn btn-secondary" id="exportSVG">
+                        <i class="fas fa-code"></i> SVG
+                    </button>
+                    <button class="btn btn-secondary" id="exportJSON">
+                        <i class="fas fa-file-code"></i> JSON
+                    </button>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" id="closeModal">Annuler</button>
+                <button class="btn btn-primary" id="copyDataBtn">
+                    <i class="fas fa-copy"></i> Copier les données
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class GeometryApp {
+            constructor() {
+                this.canvas = document.getElementById('geometryCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.shapes = [];
+                this.selectedShape = null;
+                this.currentTool = 'select';
+                this.isDrawing = false;
+                this.currentPoints = [];
+                this.gridSize = 20;
+                this.showGrid = true;
+                this.snapToGrid = true;
+                this.scale = 1;
+                this.offsetX = 0;
+                this.offsetY = 0;
+                this.panStart = { x: 0, y: 0 };
+                this.isPanning = false;
+                this.history = [];
+                this.historyIndex = -1;
+                
+                this.colors = [
+                    '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b',
+                    '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupCanvas();
+                this.bindEvents();
+                this.setupGrid();
+                this.draw();
+                this.saveHistory();
+            }
+            
+            setupCanvas() {
+                // Set canvas size to container size
+                const container = this.canvas.parentElement;
+                this.canvas.width = container.clientWidth;
+                this.canvas.height = container.clientHeight;
+                
+                // Center view
+                this.offsetX = this.canvas.width / 2;
+                this.offsetY = this.canvas.height / 2;
+            }
+            
+            bindEvents() {
+                // Tool buttons
+                document.querySelectorAll('.tool-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tool = btn.dataset.tool;
+                        this.setTool(tool, btn);
+                    });
+                });
+                
+                // Preset buttons
+                document.querySelectorAll('.preset-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const preset = btn.dataset.preset;
+                        this.loadPreset(preset);
+                    });
+                });
+                
+                // Control buttons
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearAll();
+                });
+                
+                document.getElementById('gridToggle').addEventListener('click', (e) => {
+                    this.toggleGrid(e.target);
+                });
+                
+                document.getElementById('snapToggle').addEventListener('click', (e) => {
+                    this.toggleSnap(e.target);
+                });
+                
+                document.getElementById('exportBtn').addEventListener('click', () => {
+                    this.openExportModal();
+                });
+                
+                // Canvas controls
+                document.getElementById('zoomInBtn').addEventListener('click', () => {
+                    this.zoom(1.2);
+                });
+                
+                document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                    this.zoom(0.8);
+                });
+                
+                document.getElementById('resetViewBtn').addEventListener('click', () => {
+                    this.resetView();
+                });
+                
+                // Canvas events
+                this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                this.canvas.addEventListener('dblclick', (e) => this.handleDoubleClick(e));
+                this.canvas.addEventListener('wheel', (e) => this.handleWheel(e));
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey) {
+                        switch(e.key) {
+                            case 'z':
+                                e.preventDefault();
+                                this.undo();
+                                break;
+                            case 'y':
+                                e.preventDefault();
+                                this.redo();
+                                break;
+                            case 's':
+                                e.preventDefault();
+                                this.saveScene();
+                                break;
+                        }
+                    }
+                    
+                    if (e.key === 'Delete') {
+                        this.deleteSelected();
+                    }
+                    
+                    if (e.key === 'Escape') {
+                        this.cancelDrawing();
+                    }
+                });
+                
+                // Color picker
+                document.getElementById('colorPicker').addEventListener('input', (e) => {
+                    if (this.selectedShape) {
+                        this.selectedShape.color = e.target.value;
+                        this.updateShapeList();
+                        this.draw();
+                    }
+                });
+                
+                // Line width
+                document.getElementById('lineWidth').addEventListener('input', (e) => {
+                    if (this.selectedShape) {
+                        this.selectedShape.lineWidth = parseInt(e.target.value);
+                        this.draw();
+                    }
+                });
+                
+                // Line style
+                document.getElementById('lineStyle').addEventListener('change', (e) => {
+                    if (this.selectedShape) {
+                        this.selectedShape.lineStyle = e.target.value;
+                        this.draw();
+                    }
+                });
+                
+                // Export modal
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    this.closeExportModal();
+                });
+                
+                document.getElementById('exportPNG').addEventListener('click', () => {
+                    this.exportPNG();
+                });
+                
+                document.getElementById('exportSVG').addEventListener('click', () => {
+                    this.exportSVG();
+                });
+                
+                document.getElementById('exportJSON').addEventListener('click', () => {
+                    this.exportJSON();
+                });
+                
+                document.getElementById('copyDataBtn').addEventListener('click', () => {
+                    this.copySceneData();
+                });
+                
+                // Update canvas on resize
+                window.addEventListener('resize', () => {
+                    this.setupCanvas();
+                    this.draw();
+                });
+            }
+            
+            setTool(tool, button) {
+                // Update active button
+                document.querySelectorAll('.tool-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                
+                this.currentTool = tool;
+                this.cancelDrawing();
+                
+                // Update info display
+                document.getElementById('currentMode').textContent = 
+                    this.getToolName(tool);
+                
+                // Update cursor
+                this.canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+            }
+            
+            getToolName(tool) {
+                const names = {
+                    'select': 'Sélection',
+                    'point': 'Point',
+                    'line': 'Segment',
+                    'circle': 'Cercle',
+                    'triangle': 'Triangle',
+                    'rectangle': 'Rectangle',
+                    'polygon': 'Polygone',
+                    'measure': 'Mesure',
+                    'transform': 'Transformation'
+                };
+                return names[tool] || tool;
+            }
+            
+            getMousePos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / this.scale - this.offsetX;
+                const y = (e.clientY - rect.top) / this.scale - this.offsetY;
+                
+                if (this.snapToGrid && this.currentTool !== 'select') {
+                    return {
+                        x: Math.round(x / this.gridSize) * this.gridSize,
+                        y: Math.round(y / this.gridSize) * this.gridSize
+                    };
+                }
+                
+                return { x, y };
+            }
+            
+            handleMouseDown(e) {
+                const pos = this.getMousePos(e);
+                
+                if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
+                    // Middle click or Ctrl+left click for panning
+                    this.isPanning = true;
+                    this.panStart = { x: e.clientX, y: e.clientY };
+                    this.canvas.style.cursor = 'grabbing';
+                    return;
+                }
+                
+                if (e.button === 0) { // Left click
+                    switch(this.currentTool) {
+                        case 'select':
+                            this.selectShape(pos);
+                            break;
+                        case 'point':
+                            this.createPoint(pos);
+                            break;
+                        case 'line':
+                        case 'circle':
+                        case 'rectangle':
+                        case 'triangle':
+                            if (!this.isDrawing) {
+                                this.startDrawing(pos);
+                            } else {
+                                this.finishDrawing(pos);
+                            }
+                            break;
+                        case 'polygon':
+                            if (!this.isDrawing) {
+                                this.startDrawing(pos);
+                            } else {
+                                this.addPolygonPoint(pos);
+                            }
+                            break;
+                        case 'measure':
+                            if (!this.isDrawing) {
+                                this.startMeasurement(pos);
+                            } else {
+                                this.finishMeasurement(pos);
+                            }
+                            break;
+                        case 'transform':
+                            this.startTransform(pos);
+                            break;
+                    }
+                }
+            }
+            
+            handleMouseMove(e) {
+                const pos = this.getMousePos(e);
+                
+                if (this.isPanning) {
+                    const dx = e.clientX - this.panStart.x;
+                    const dy = e.clientY - this.panStart.y;
+                    this.offsetX += dx / this.scale;
+                    this.offsetY += dy / this.scale;
+                    this.panStart = { x: e.clientX, y: e.clientY };
+                    this.draw();
+                    return;
+                }
+                
+                // Update cursor position display
+                document.getElementById('canvasInfo').innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    Mode: ${this.getToolName(this.currentTool)} | 
+                    Formes: ${this.shapes.length} | 
+                    Position: (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})
+                `;
+                
+                if (this.isDrawing && this.currentPoints.length > 0) {
+                    this.currentPoints[this.currentPoints.length - 1] = pos;
+                    this.draw();
+                }
+            }
+            
+            handleMouseUp(e) {
+                if (this.isPanning) {
+                    this.isPanning = false;
+                    this.canvas.style.cursor = 'crosshair';
+                    this.saveHistory();
+                }
+            }
+            
+            handleDoubleClick(e) {
+                if (this.currentTool === 'polygon' && this.isDrawing) {
+                    this.finishPolygon();
+                }
+            }
+            
+            handleWheel(e) {
+                e.preventDefault();
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                this.zoom(zoomFactor, e);
+            }
+            
+            selectShape(pos) {
+                this.selectedShape = null;
+                
+                // Check shapes in reverse order (top to bottom)
+                for (let i = this.shapes.length - 1; i >= 0; i--) {
+                    if (this.shapes[i].containsPoint && this.shapes[i].containsPoint(pos)) {
+                        this.selectedShape = this.shapes[i];
+                        this.updateProperties();
+                        this.updateShapeList();
+                        this.draw();
+                        return;
+                    }
+                }
+                
+                this.updateProperties();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            createPoint(pos) {
+                const point = {
+                    type: 'point',
+                    x: pos.x,
+                    y: pos.y,
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    radius: 5,
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    fill: true,
+                    containsPoint: function(p) {
+                        const dx = p.x - this.x;
+                        const dy = p.y - this.y;
+                        return Math.sqrt(dx * dx + dy * dy) <= this.radius * 2;
+                    }
+                };
+                
+                this.shapes.push(point);
+                this.selectedShape = point;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            startDrawing(pos) {
+                this.isDrawing = true;
+                this.currentPoints = [pos, pos];
+            }
+            
+            finishDrawing(pos) {
+                this.isDrawing = false;
+                
+                switch(this.currentTool) {
+                    case 'line':
+                        this.createLine(this.currentPoints[0], pos);
+                        break;
+                    case 'circle':
+                        const radius = Math.sqrt(
+                            Math.pow(pos.x - this.currentPoints[0].x, 2) +
+                            Math.pow(pos.y - this.currentPoints[0].y, 2)
+                        );
+                        this.createCircle(this.currentPoints[0], radius);
+                        break;
+                    case 'rectangle':
+                        this.createRectangle(this.currentPoints[0], pos);
+                        break;
+                    case 'triangle':
+                        this.createTriangle(this.currentPoints[0], pos);
+                        break;
+                }
+                
+                this.currentPoints = [];
+            }
+            
+            addPolygonPoint(pos) {
+                this.currentPoints.splice(this.currentPoints.length - 1, 0, pos);
+                this.currentPoints.push(pos);
+                this.draw();
+            }
+            
+            finishPolygon() {
+                if (this.currentPoints.length >= 3) {
+                    this.createPolygon(this.currentPoints.slice(0, -1));
+                }
+                this.isDrawing = false;
+                this.currentPoints = [];
+            }
+            
+            createLine(start, end) {
+                const line = {
+                    type: 'line',
+                    start: { ...start },
+                    end: { ...end },
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    containsPoint: function(p) {
+                        // Check if point is near the line
+                        const A = { x: p.x - this.start.x, y: p.y - this.start.y };
+                        const B = { x: this.end.x - this.start.x, y: this.end.y - this.start.y };
+                        const dot = A.x * B.x + A.y * B.y;
+                        const lenSq = B.x * B.x + B.y * B.y;
+                        const param = dot / lenSq;
+                        
+                        let closest;
+                        if (param < 0) closest = this.start;
+                        else if (param > 1) closest = this.end;
+                        else {
+                            closest = {
+                                x: this.start.x + param * B.x,
+                                y: this.start.y + param * B.y
+                            };
+                        }
+                        
+                        const dx = p.x - closest.x;
+                        const dy = p.y - closest.y;
+                        return Math.sqrt(dx * dx + dy * dy) <= 10;
+                    }
+                };
+                
+                this.shapes.push(line);
+                this.selectedShape = line;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            createCircle(center, radius) {
+                const circle = {
+                    type: 'circle',
+                    center: { ...center },
+                    radius: radius,
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    fill: false,
+                    containsPoint: function(p) {
+                        const dx = p.x - this.center.x;
+                        const dy = p.y - this.center.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        return Math.abs(distance - this.radius) <= 10;
+                    }
+                };
+                
+                this.shapes.push(circle);
+                this.selectedShape = circle;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            createRectangle(start, end) {
+                const rect = {
+                    type: 'rectangle',
+                    x: Math.min(start.x, end.x),
+                    y: Math.min(start.y, end.y),
+                    width: Math.abs(end.x - start.x),
+                    height: Math.abs(end.y - start.y),
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    fill: false,
+                    containsPoint: function(p) {
+                        return p.x >= this.x - 5 && p.x <= this.x + this.width + 5 &&
+                               p.y >= this.y - 5 && p.y <= this.y + this.height + 5;
+                    }
+                };
+                
+                this.shapes.push(rect);
+                this.selectedShape = rect;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            createTriangle(start, end) {
+                const triangle = {
+                    type: 'polygon',
+                    points: [
+                        start,
+                        { x: end.x, y: start.y },
+                        { x: (start.x + end.x) / 2, y: end.y }
+                    ],
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    fill: false,
+                    containsPoint: function(p) {
+                        // Check if point is inside triangle using barycentric coordinates
+                        const v0 = { x: this.points[2].x - this.points[0].x, y: this.points[2].y - this.points[0].y };
+                        const v1 = { x: this.points[1].x - this.points[0].x, y: this.points[1].y - this.points[0].y };
+                        const v2 = { x: p.x - this.points[0].x, y: p.y - this.points[0].y };
+                        
+                        const dot00 = v0.x * v0.x + v0.y * v0.y;
+                        const dot01 = v0.x * v1.x + v0.y * v1.y;
+                        const dot02 = v0.x * v2.x + v0.y * v2.y;
+                        const dot11 = v1.x * v1.x + v1.y * v1.y;
+                        const dot12 = v1.x * v2.x + v1.y * v2.y;
+                        
+                        const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+                        const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+                        const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+                        
+                        return (u >= 0) && (v >= 0) && (u + v < 1);
+                    }
+                };
+                
+                this.shapes.push(triangle);
+                this.selectedShape = triangle;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            createPolygon(points) {
+                const polygon = {
+                    type: 'polygon',
+                    points: points,
+                    color: this.colors[this.shapes.length % this.colors.length],
+                    lineWidth: 2,
+                    lineStyle: 'solid',
+                    fill: false,
+                    containsPoint: function(p) {
+                        // Simple bounding box check for now
+                        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                        this.points.forEach(pt => {
+                            minX = Math.min(minX, pt.x);
+                            maxX = Math.max(maxX, pt.x);
+                            minY = Math.min(minY, pt.y);
+                            maxY = Math.max(maxY, pt.y);
+                        });
+                        return p.x >= minX - 5 && p.x <= maxX + 5 &&
+                               p.y >= minY - 5 && p.y <= maxY + 5;
+                    }
+                };
+                
+                this.shapes.push(polygon);
+                this.selectedShape = polygon;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            startMeasurement(start) {
+                this.isDrawing = true;
+                this.currentPoints = [start, start];
+            }
+            
+            finishMeasurement(end) {
+                this.isDrawing = false;
+                
+                const dx = end.x - this.currentPoints[0].x;
+                const dy = end.y - this.currentPoints[0].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                const measurement = {
+                    type: 'measurement',
+                    start: { ...this.currentPoints[0] },
+                    end: { ...end },
+                    distance: distance,
+                    angle: angle,
+                    color: '#10b981',
+                    lineWidth: 1,
+                    lineStyle: 'dashed',
+                    containsPoint: function(p) {
+                        // Check if point is near the measurement line
+                        const A = { x: p.x - this.start.x, y: p.y - this.start.y };
+                        const B = { x: this.end.x - this.start.x, y: this.end.y - this.start.y };
+                        const dot = A.x * B.x + A.y * B.y;
+                        const lenSq = B.x * B.x + B.y * B.y;
+                        const param = dot / lenSq;
+                        
+                        let closest;
+                        if (param < 0) closest = this.start;
+                        else if (param > 1) closest = this.end;
+                        else {
+                            closest = {
+                                x: this.start.x + param * B.x,
+                                y: this.start.y + param * B.y
+                            };
+                        }
+                        
+                        const dx = p.x - closest.x;
+                        const dy = p.y - closest.y;
+                        return Math.sqrt(dx * dx + dy * dy) <= 10;
+                    }
+                };
+                
+                this.shapes.push(measurement);
+                this.selectedShape = measurement;
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+                this.currentPoints = [];
+            }
+            
+            startTransform(pos) {
+                if (this.selectedShape) {
+                    this.showNotification('Utilisez les poignées pour transformer la forme', 'info');
+                }
+            }
+            
+            cancelDrawing() {
+                this.isDrawing = false;
+                this.currentPoints = [];
+                this.draw();
+            }
+            
+            deleteSelected() {
+                if (this.selectedShape) {
+                    const index = this.shapes.indexOf(this.selectedShape);
+                    if (index > -1) {
+                        this.shapes.splice(index, 1);
+                        this.selectedShape = null;
+                        this.saveHistory();
+                        this.updateShapeList();
+                        this.draw();
+                    }
+                }
+            }
+            
+            updateProperties() {
+                if (this.selectedShape) {
+                    // Update color picker
+                    document.getElementById('colorPicker').value = this.selectedShape.color;
+                    document.querySelector('.color-picker div').style.background = this.selectedShape.color;
+                    
+                    // Update line width
+                    document.getElementById('lineWidth').value = this.selectedShape.lineWidth || 2;
+                    
+                    // Update line style
+                    document.getElementById('lineStyle').value = this.selectedShape.lineStyle || 'solid';
+                    
+                    // Update measurements
+                    this.updateMeasurements();
+                }
+            }
+            
+            updateMeasurements() {
+                if (!this.selectedShape) return;
+                
+                let length = 0;
+                let angle = 0;
+                let area = 0;
+                let perimeter = 0;
+                
+                switch(this.selectedShape.type) {
+                    case 'line':
+                        const dx = this.selectedShape.end.x - this.selectedShape.start.x;
+                        const dy = this.selectedShape.end.y - this.selectedShape.start.y;
+                        length = Math.sqrt(dx * dx + dy * dy);
+                        angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                        break;
+                        
+                    case 'circle':
+                        length = this.selectedShape.radius * 2;
+                        area = Math.PI * this.selectedShape.radius * this.selectedShape.radius;
+                        perimeter = 2 * Math.PI * this.selectedShape.radius;
+                        break;
+                        
+                    case 'rectangle':
+                        length = Math.max(this.selectedShape.width, this.selectedShape.height);
+                        area = this.selectedShape.width * this.selectedShape.height;
+                        perimeter = 2 * (this.selectedShape.width + this.selectedShape.height);
+                        break;
+                        
+                    case 'polygon':
+                        if (this.selectedShape.points && this.selectedShape.points.length >= 3) {
+                            // Calculate area using shoelace formula
+                            let areaSum = 0;
+                            let perimeterSum = 0;
+                            const points = this.selectedShape.points;
+                            
+                            for (let i = 0; i < points.length; i++) {
+                                const j = (i + 1) % points.length;
+                                areaSum += points[i].x * points[j].y;
+                                areaSum -= points[j].x * points[i].y;
+                                
+                                const dx = points[j].x - points[i].x;
+                                const dy = points[j].y - points[i].y;
+                                perimeterSum += Math.sqrt(dx * dx + dy * dy);
+                            }
+                            
+                            area = Math.abs(areaSum) / 2;
+                            perimeter = perimeterSum;
+                        }
+                        break;
+                        
+                    case 'measurement':
+                        length = this.selectedShape.distance || 0;
+                        angle = this.selectedShape.angle || 0;
+                        break;
+                }
+                
+                document.getElementById('lengthValue').textContent = length.toFixed(2);
+                document.getElementById('angleValue').textContent = angle.toFixed(2) + '°';
+                document.getElementById('areaValue').textContent = area.toFixed(2);
+                document.getElementById('perimeterValue').textContent = perimeter.toFixed(2);
+            }
+            
+            updateShapeList() {
+                const list = document.getElementById('shapesList');
+                list.innerHTML = '';
+                
+                this.shapes.forEach((shape, index) => {
+                    const isActive = shape === this.selectedShape;
+                    const item = document.createElement('div');
+                    item.className = `shape-item ${isActive ? 'active' : ''}`;
+                    
+                    // Shape icon based on type
+                    let icon = 'fas fa-question';
+                    let name = 'Forme';
+                    
+                    switch(shape.type) {
+                        case 'point':
+                            icon = 'fas fa-circle';
+                            name = 'Point';
+                            break;
+                        case 'line':
+                            icon = 'fas fa-slash';
+                            name = 'Segment';
+                            break;
+                        case 'circle':
+                            icon = 'fas fa-circle';
+                            name = 'Cercle';
+                            break;
+                        case 'rectangle':
+                            icon = 'fas fa-square';
+                            name = 'Rectangle';
+                            break;
+                        case 'polygon':
+                            icon = 'fas fa-shapes';
+                            name = `Polygone (${shape.points ? shape.points.length : 0} côtés)`;
+                            break;
+                        case 'measurement':
+                            icon = 'fas fa-ruler';
+                            name = 'Mesure';
+                            break;
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="shape-color" style="background: ${shape.color}"></div>
+                        <div class="shape-info">
+                            <div class="shape-name">${name}</div>
+                            <div class="shape-details">
+                                <i class="${icon}"></i>
+                                ${this.getShapeDetails(shape)}
+                            </div>
+                        </div>
+                        <div class="shape-actions">
+                            <button class="action-btn select-shape" data-index="${index}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn delete-shape" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.closest('.action-btn')) {
+                            this.selectedShape = shape;
+                            this.updateProperties();
+                            this.updateShapeList();
+                            this.draw();
+                        }
+                    });
+                    
+                    list.appendChild(item);
+                });
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.select-shape').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const index = parseInt(btn.dataset.index);
+                        this.selectShapeByIndex(index);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-shape').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const index = parseInt(btn.dataset.index);
+                        this.deleteShape(index);
+                    });
+                });
+                
+                document.getElementById('shapesCount').textContent = this.shapes.length;
+            }
+            
+            getShapeDetails(shape) {
+                switch(shape.type) {
+                    case 'point':
+                        return `(${shape.x.toFixed(1)}, ${shape.y.toFixed(1)})`;
+                    case 'line':
+                        return `${this.calculateDistance(shape.start, shape.end).toFixed(1)} unités`;
+                    case 'circle':
+                        return `Rayon: ${shape.radius.toFixed(1)}`;
+                    case 'rectangle':
+                        return `${shape.width.toFixed(1)} × ${shape.height.toFixed(1)}`;
+                    case 'measurement':
+                        return `${(shape.distance || 0).toFixed(1)} unités`;
+                    default:
+                        return '';
+                }
+            }
+            
+            calculateDistance(p1, p2) {
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            selectShapeByIndex(index) {
+                if (index >= 0 && index < this.shapes.length) {
+                    this.selectedShape = this.shapes[index];
+                    this.updateProperties();
+                    this.updateShapeList();
+                    this.draw();
+                }
+            }
+            
+            deleteShape(index) {
+                if (index >= 0 && index < this.shapes.length) {
+                    if (this.selectedShape === this.shapes[index]) {
+                        this.selectedShape = null;
+                    }
+                    this.shapes.splice(index, 1);
+                    this.saveHistory();
+                    this.updateShapeList();
+                    this.draw();
+                }
+            }
+            
+            setupGrid() {
+                // Create grid pattern
+                const gridCanvas = document.createElement('canvas');
+                const gridCtx = gridCanvas.getContext('2d');
+                gridCanvas.width = this.gridSize * 2;
+                gridCanvas.height = this.gridSize * 2;
+                
+                gridCtx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+                
+                gridCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                gridCtx.lineWidth = 1;
+                
+                // Vertical line
+                gridCtx.beginPath();
+                gridCtx.moveTo(this.gridSize, 0);
+                gridCtx.lineTo(this.gridSize, gridCanvas.height);
+                gridCtx.stroke();
+                
+                // Horizontal line
+                gridCtx.beginPath();
+                gridCtx.moveTo(0, this.gridSize);
+                gridCtx.lineTo(gridCanvas.width, this.gridSize);
+                gridCtx.stroke();
+                
+                this.gridPattern = this.ctx.createPattern(gridCanvas, 'repeat');
+            }
+            
+            drawGrid() {
+                if (!this.showGrid || !this.gridPattern) return;
+                
+                this.ctx.save();
+                this.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+                this.ctx.scale(this.scale, this.scale);
+                
+                this.ctx.fillStyle = this.gridPattern;
+                this.ctx.fillRect(-this.canvas.width, -this.canvas.height, 
+                                this.canvas.width * 2, this.canvas.height * 2);
+                
+                this.ctx.restore();
+            }
+            
+            drawAxes() {
+                this.ctx.save();
+                this.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+                this.ctx.scale(this.scale, this.scale);
+                
+                // X axis
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.lineWidth = 1;
+                this.ctx.setLineDash([]);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(-this.canvas.width, 0);
+                this.ctx.lineTo(this.canvas.width, 0);
+                this.ctx.stroke();
+                
+                // Y axis
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, -this.canvas.height);
+                this.ctx.lineTo(0, this.canvas.height);
+                this.ctx.stroke();
+                
+                // Axis labels
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                this.ctx.font = '12px Arial';
+                this.ctx.fillText('x', this.canvas.width / this.scale - 15, 10);
+                this.ctx.fillText('y', -10, -this.canvas.height / this.scale + 15);
+                
+                this.ctx.restore();
+            }
+            
+            draw() {
+                // Clear canvas
+                this.ctx.fillStyle = '#0f172a';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw grid and axes
+                this.drawGrid();
+                this.drawAxes();
+                
+                // Draw shapes
+                this.shapes.forEach(shape => {
+                    this.drawShape(shape);
+                });
+                
+                // Draw current drawing
+                if (this.isDrawing && this.currentPoints.length > 1) {
+                    this.drawCurrentShape();
+                }
+                
+                // Draw selection
+                if (this.selectedShape) {
+                    this.drawSelection(this.selectedShape);
+                }
+            }
+            
+            drawShape(shape) {
+                this.ctx.save();
+                this.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+                this.ctx.scale(this.scale, this.scale);
+                
+                this.ctx.strokeStyle = shape.color;
+                this.ctx.fillStyle = shape.fill ? shape.color + '40' : 'transparent';
+                this.ctx.lineWidth = shape.lineWidth || 2;
+                
+                // Set line style
+                switch(shape.lineStyle) {
+                    case 'dashed':
+                        this.ctx.setLineDash([5, 5]);
+                        break;
+                    case 'dotted':
+                        this.ctx.setLineDash([2, 2]);
+                        break;
+                    default:
+                        this.ctx.setLineDash([]);
+                }
+                
+                switch(shape.type) {
+                    case 'point':
+                        this.ctx.beginPath();
+                        this.ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'line':
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(shape.start.x, shape.start.y);
+                        this.ctx.lineTo(shape.end.x, shape.end.y);
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'circle':
+                        this.ctx.beginPath();
+                        this.ctx.arc(shape.center.x, shape.center.y, shape.radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'rectangle':
+                        this.ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+                        this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+                        break;
+                        
+                    case 'polygon':
+                        if (shape.points && shape.points.length >= 3) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(shape.points[0].x, shape.points[0].y);
+                            for (let i = 1; i < shape.points.length; i++) {
+                                this.ctx.lineTo(shape.points[i].x, shape.points[i].y);
+                            }
+                            this.ctx.closePath();
+                            this.ctx.fill();
+                            this.ctx.stroke();
+                        }
+                        break;
+                        
+                    case 'measurement':
+                        // Draw measurement line
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(shape.start.x, shape.start.y);
+                        this.ctx.lineTo(shape.end.x, shape.end.y);
+                        this.ctx.stroke();
+                        
+                        // Draw measurement text
+                        this.ctx.fillStyle = shape.color;
+                        this.ctx.font = '12px Arial';
+                        const midX = (shape.start.x + shape.end.x) / 2;
+                        const midY = (shape.start.y + shape.end.y) / 2;
+                        this.ctx.fillText(
+                            `${shape.distance.toFixed(2)} u`,
+                            midX,
+                            midY - 10
+                        );
+                        break;
+                }
+                
+                this.ctx.restore();
+            }
+            
+            drawCurrentShape() {
+                if (this.currentPoints.length < 2) return;
+                
+                this.ctx.save();
+                this.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+                this.ctx.scale(this.scale, this.scale);
+                
+                this.ctx.strokeStyle = '#3b82f6';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([5, 5]);
+                
+                switch(this.currentTool) {
+                    case 'line':
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.currentPoints[0].x, this.currentPoints[0].y);
+                        this.ctx.lineTo(this.currentPoints[1].x, this.currentPoints[1].y);
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'circle':
+                        const radius = Math.sqrt(
+                            Math.pow(this.currentPoints[1].x - this.currentPoints[0].x, 2) +
+                            Math.pow(this.currentPoints[1].y - this.currentPoints[0].y, 2)
+                        );
+                        this.ctx.beginPath();
+                        this.ctx.arc(this.currentPoints[0].x, this.currentPoints[0].y, radius, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'rectangle':
+                    case 'triangle':
+                        this.ctx.strokeRect(
+                            this.currentPoints[0].x,
+                            this.currentPoints[0].y,
+                            this.currentPoints[1].x - this.currentPoints[0].x,
+                            this.currentPoints[1].y - this.currentPoints[0].y
+                        );
+                        break;
+                        
+                    case 'polygon':
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.currentPoints[0].x, this.currentPoints[0].y);
+                        for (let i = 1; i < this.currentPoints.length; i++) {
+                            this.ctx.lineTo(this.currentPoints[i].x, this.currentPoints[i].y);
+                        }
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'measure':
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.currentPoints[0].x, this.currentPoints[0].y);
+                        this.ctx.lineTo(this.currentPoints[1].x, this.currentPoints[1].y);
+                        this.ctx.stroke();
+                        break;
+                }
+                
+                this.ctx.restore();
+            }
+            
+            drawSelection(shape) {
+                this.ctx.save();
+                this.ctx.translate(this.offsetX * this.scale, this.offsetY * this.scale);
+                this.ctx.scale(this.scale, this.scale);
+                
+                this.ctx.strokeStyle = '#f59e0b';
+                this.ctx.fillStyle = '#f59e0b40';
+                this.ctx.lineWidth = 1;
+                this.ctx.setLineDash([3, 3]);
+                
+                switch(shape.type) {
+                    case 'point':
+                        this.ctx.beginPath();
+                        this.ctx.arc(shape.x, shape.y, shape.radius + 5, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                        break;
+                        
+                    case 'line':
+                        // Draw handles at endpoints
+                        this.drawHandle(shape.start);
+                        this.drawHandle(shape.end);
+                        break;
+                        
+                    case 'circle':
+                        this.ctx.beginPath();
+                        this.ctx.arc(shape.center.x, shape.center.y, shape.radius + 3, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                        this.drawHandle(shape.center);
+                        break;
+                        
+                    case 'rectangle':
+                        this.ctx.strokeRect(shape.x - 3, shape.y - 3, shape.width + 6, shape.height + 6);
+                        // Draw handles at corners
+                        this.drawHandle({ x: shape.x, y: shape.y });
+                        this.drawHandle({ x: shape.x + shape.width, y: shape.y });
+                        this.drawHandle({ x: shape.x + shape.width, y: shape.y + shape.height });
+                        this.drawHandle({ x: shape.x, y: shape.y + shape.height });
+                        break;
+                        
+                    case 'polygon':
+                        if (shape.points) {
+                            shape.points.forEach(point => {
+                                this.drawHandle(point);
+                            });
+                        }
+                        break;
+                        
+                    case 'measurement':
+                        this.drawHandle(shape.start);
+                        this.drawHandle(shape.end);
+                        break;
+                }
+                
+                this.ctx.restore();
+            }
+            
+            drawHandle(point) {
+                this.ctx.fillStyle = '#f59e0b';
+                this.ctx.beginPath();
+                this.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.stroke();
+            }
+            
+            toggleGrid(button) {
+                this.showGrid = !this.showGrid;
+                if (this.showGrid) {
+                    button.innerHTML = '<i class="fas fa-th"></i> Grille';
+                } else {
+                    button.innerHTML = '<i class="fas fa-th-slash"></i> Grille';
+                }
+                this.draw();
+            }
+            
+            toggleSnap(button) {
+                this.snapToGrid = !this.snapToGrid;
+                if (this.snapToGrid) {
+                    button.innerHTML = '<i class="fas fa-magnet"></i> Magnétisme';
+                    button.style.background = 'var(--primary)';
+                } else {
+                    button.innerHTML = '<i class="fas fa-magnet"></i> Magnétisme';
+                    button.style.background = '';
+                }
+            }
+            
+            zoom(factor, event = null) {
+                const oldScale = this.scale;
+                this.scale *= factor;
+                this.scale = Math.max(0.1, Math.min(10, this.scale));
+                
+                if (event) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+                    
+                    // Adjust offset to zoom around mouse position
+                    this.offsetX -= (mouseX / oldScale - this.offsetX) * (factor - 1);
+                    this.offsetY -= (mouseY / oldScale - this.offsetY) * (factor - 1);
+                }
+                
+                this.draw();
+            }
+            
+            resetView() {
+                this.scale = 1;
+                this.offsetX = this.canvas.width / 2;
+                this.offsetY = this.canvas.height / 2;
+                this.draw();
+            }
+            
+            loadPreset(preset) {
+                this.clearAll();
+                
+                switch(preset) {
+                    case 'pythagoras':
+                        // Pythagorean theorem demonstration
+                        const triangle = {
+                            type: 'polygon',
+                            points: [
+                                { x: 0, y: 0 },
+                                { x: 300, y: 0 },
+                                { x: 0, y: 400 }
+                            ],
+                            color: '#3b82f6',
+                            fill: true,
+                            lineWidth: 2,
+                            lineStyle: 'solid',
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        const squareA = {
+                            type: 'polygon',
+                            points: [
+                                { x: 0, y: 0 },
+                                { x: 0, y: 400 },
+                                { x: -400, y: 400 },
+                                { x: -400, y: 0 }
+                            ],
+                            color: '#10b981',
+                            fill: true,
+                            lineStyle: 'dashed',
+                            lineWidth: 2,
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        const squareB = {
+                            type: 'polygon',
+                            points: [
+                                { x: 0, y: 0 },
+                                { x: 300, y: 0 },
+                                { x: 300, y: -300 },
+                                { x: 0, y: -300 }
+                            ],
+                            color: '#8b5cf6',
+                            fill: true,
+                            lineStyle: 'dashed',
+                            lineWidth: 2,
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        const squareC = {
+                            type: 'polygon',
+                            points: [
+                                { x: 300, y: 0 },
+                                { x: 0, y: 400 },
+                                { x: -100, y: 700 },
+                                { x: 200, y: 300 }
+                            ],
+                            color: '#f59e0b',
+                            fill: true,
+                            lineStyle: 'dashed',
+                            lineWidth: 2,
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        this.shapes.push(triangle, squareA, squareB, squareC);
+                        break;
+                        
+                    case 'triangle':
+                        // Equilateral triangle
+                        const side = 200;
+                        const height = side * Math.sqrt(3) / 2;
+                        
+                        const equilateral = {
+                            type: 'polygon',
+                            points: [
+                                { x: 0, y: 0 },
+                                { x: side, y: 0 },
+                                { x: side / 2, y: -height }
+                            ],
+                            color: '#3b82f6',
+                            fill: true,
+                            lineWidth: 2,
+                            lineStyle: 'solid',
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        this.shapes.push(equilateral);
+                        break;
+                        
+                    case 'circle':
+                        // Unit circle with radius lines
+                        const unitCircle = {
+                            type: 'circle',
+                            center: { x: 0, y: 0 },
+                            radius: 150,
+                            color: '#3b82f6',
+                            lineWidth: 2,
+                            lineStyle: 'solid',
+                            fill: false,
+                            containsPoint: function(p) {
+                                const dx = p.x - this.center.x;
+                                const dy = p.y - this.center.y;
+                                const distance = Math.sqrt(dx * dx + dy * dy);
+                                return Math.abs(distance - this.radius) <= 10;
+                            }
+                        };
+                        
+                        for (let angle = 0; angle < 360; angle += 30) {
+                            const rad = angle * Math.PI / 180;
+                            const radiusLine = {
+                                type: 'line',
+                                start: { x: 0, y: 0 },
+                                end: { 
+                                    x: 150 * Math.cos(rad),
+                                    y: 150 * Math.sin(rad)
+                                },
+                                color: '#10b981',
+                                lineStyle: 'dashed',
+                                lineWidth: 1,
+                                containsPoint: function(p) {
+                                    return true;
+                                }
+                            };
+                            this.shapes.push(radiusLine);
+                        }
+                        
+                        this.shapes.push(unitCircle);
+                        break;
+                        
+                    case 'polygon':
+                        // Regular hexagon
+                        const hexagon = {
+                            type: 'polygon',
+                            points: [],
+                            color: '#8b5cf6',
+                            fill: true,
+                            lineWidth: 2,
+                            lineStyle: 'solid',
+                            containsPoint: function(p) {
+                                return true;
+                            }
+                        };
+                        
+                        const sides = 6;
+                        const radius = 150;
+                        for (let i = 0; i < sides; i++) {
+                            const angle = (i * 2 * Math.PI) / sides;
+                            hexagon.points.push({
+                                x: radius * Math.cos(angle),
+                                y: radius * Math.sin(angle)
+                            });
+                        }
+                        
+                        this.shapes.push(hexagon);
+                        break;
+                        
+                    case 'grid':
+                        this.showGrid = true;
+                        document.getElementById('gridToggle').innerHTML = '<i class="fas fa-th"></i> Grille';
+                        this.draw();
+                        break;
+                        
+                    case 'axes':
+                        this.offsetX = this.canvas.width / 2;
+                        this.offsetY = this.canvas.height / 2;
+                        this.draw();
+                        break;
+                }
+                
+                this.saveHistory();
+                this.updateShapeList();
+                this.draw();
+            }
+            
+            clearAll() {
+                this.shapes = [];
+                this.selectedShape = null;
+                this.isDrawing = false;
+                this.currentPoints = [];
+                this.saveHistory();
+                this.updateShapeList();
+                this.updateProperties();
+                this.draw();
+            }
+            
+            saveHistory() {
+                // Keep only recent history
+                this.history = this.history.slice(0, this.historyIndex + 1);
+                this.history.push(JSON.parse(JSON.stringify(this.shapes)));
+                this.historyIndex++;
+            }
+            
+            undo() {
+                if (this.historyIndex > 0) {
+                    this.historyIndex--;
+                    this.shapes = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+                    this.selectedShape = null;
+                    this.updateShapeList();
+                    this.updateProperties();
+                    this.draw();
+                }
+            }
+            
+            redo() {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.historyIndex++;
+                    this.shapes = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+                    this.updateShapeList();
+                    this.updateProperties();
+                    this.draw();
+                }
+            }
+            
+            openExportModal() {
+                document.getElementById('exportModal').classList.add('active');
+            }
+            
+            closeExportModal() {
+                document.getElementById('exportModal').classList.remove('active');
+            }
+            
+            exportPNG() {
+                const link = document.createElement('a');
+                link.download = 'geometrie.png';
+                link.href = this.canvas.toDataURL('image/png');
+                link.click();
+                this.closeExportModal();
+                this.showNotification('Image exportée en PNG', 'success');
+            }
+            
+            exportSVG() {
+                // Simplified SVG export
+                let svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${this.canvas.width}" height="${this.canvas.height}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="#0f172a"/>
+    <g transform="translate(${this.offsetX}, ${this.offsetY}) scale(${this.scale})">`;
+                
+                this.shapes.forEach(shape => {
+                    svg += this.shapeToSVG(shape);
+                });
+                
+                svg += `</g></svg>`;
+                
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const link = document.createElement('a');
+                link.download = 'geometrie.svg';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                this.closeExportModal();
+                this.showNotification('SVG exporté', 'success');
+            }
+            
+            shapeToSVG(shape) {
+                // Basic SVG representation
+                switch(shape.type) {
+                    case 'point':
+                        return `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.radius}" fill="${shape.color}"/>`;
+                    case 'line':
+                        return `<line x1="${shape.start.x}" y1="${shape.start.y}" x2="${shape.end.x}" y2="${shape.end.y}" stroke="${shape.color}" stroke-width="${shape.lineWidth}"/>`;
+                    case 'circle':
+                        return `<circle cx="${shape.center.x}" cy="${shape.center.y}" r="${shape.radius}" stroke="${shape.color}" stroke-width="${shape.lineWidth}" fill="none"/>`;
+                    case 'rectangle':
+                        return `<rect x="${shape.x}" y="${shape.y}" width="${shape.width}" height="${shape.height}" stroke="${shape.color}" stroke-width="${shape.lineWidth}" fill="none"/>`;
+                    default:
+                        return '';
+                }
+            }
+            
+            exportJSON() {
+                const sceneData = {
+                    shapes: this.shapes,
+                    view: {
+                        scale: this.scale,
+                        offsetX: this.offsetX,
+                        offsetY: this.offsetY,
+                        showGrid: this.showGrid,
+                        snapToGrid: this.snapToGrid
+                    },
+                    exportedAt: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(sceneData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.download = 'geometrie.json';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                this.closeExportModal();
+                this.showNotification('Données exportées en JSON', 'success');
+            }
+            
+            copySceneData() {
+                const sceneData = {
+                    shapes: this.shapes,
+                    view: {
+                        scale: this.scale,
+                        offsetX: this.offsetX,
+                        offsetY: this.offsetY
+                    }
+                };
+                
+                navigator.clipboard.writeText(JSON.stringify(sceneData, null, 2))
+                    .then(() => {
+                        this.showNotification('Données copiées dans le presse-papier', 'success');
+                    });
+            }
+            
+            saveScene() {
+                localStorage.setItem('geometryScene', JSON.stringify({
+                    shapes: this.shapes,
+                    view: {
+                        scale: this.scale,
+                        offsetX: this.offsetX,
+                        offsetY: this.offsetY
+                    }
+                }));
+                this.showNotification('Scène sauvegardée', 'success');
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: ${type === 'error' ? 'var(--danger)' : 
+                               type === 'success' ? 'var(--secondary)' : 
+                               type === 'warning' ? 'var(--warning)' : 'var(--primary)'};
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: var(--shadow-lg);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                    max-width: 400px;
+                    word-wrap: break-word;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+        
+        // Initialize geometry app
+        let geometry;
+        document.addEventListener('DOMContentLoaded', () => {
+            geometry = new GeometryApp();
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Load saved scene if exists
+            const saved = localStorage.getItem('geometryScene');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    geometry.shapes = data.shapes || [];
+                    geometry.scale = data.view?.scale || 1;
+                    geometry.offsetX = data.view?.offsetX || geometry.canvas.width / 2;
+                    geometry.offsetY = data.view?.offsetY || geometry.canvas.height / 2;
+                    geometry.updateShapeList();
+                    geometry.draw();
+                } catch (e) {
+                    console.log('No valid saved scene');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

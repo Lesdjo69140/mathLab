@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - HDI.69K</title>
+<style>
+:root {
+  --accent: #4c3be6;
+  --bg-dark: #0c0c0f;
+  --card-bg: rgba(28,28,36,0.85);
+  --text-light: #e4e4e7;
+  --hover: #7c3aed;
+}
+* { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+
+body {
+  background: url('wallpapersden.com_sung-jin-woo-solo-leveling_3840x2160.jpg') no-repeat center center/cover;
+  min-height: 100vh;
+  color: var(--text-light);
+  position: relative;
+  cursor: none; /* cacher le curseur natif */
+}
+body::before {
+  content:'';
+  position: fixed;
+  inset:0;
+  background: rgba(0,0,0,0.6);
+  z-index:0;
+}
+
+header {
+  z-index:1;
+  position:relative;
+  text-align:center;
+  padding:20px;
+}
+header h1 {
+  font-size:2.2rem;
+  color:var(--accent);
+  text-shadow:0 0 10px var(--accent);
+}
+header p {
+  margin-top:8px;
+  color:#cfd8dc;
+}
+
+main {
+  z-index:1;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
+
+/* Statistiques */
+.stats {
+  display:flex;
+  gap:20px;
+  margin-top:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.stat-card {
+  background: var(--card-bg);
+  padding:15px 20px;
+  border-radius:12px;
+  text-align:center;
+  min-width:150px;
+  box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+.stat-card h3 {
+  color: var(--accent);
+  margin-bottom:8px;
+  text-shadow:0 0 5px var(--accent);
+}
+.stat-card p {
+  font-size:1.1rem;
+  font-weight:600;
+  color:#fff;
+}
+
+/* Section packs */
+.packs-section {
+  margin-top:25px;
+  width:100%;
+  max-width:1000px;
+}
+.packs-section h2 {
+  text-align:center;
+  margin-bottom:10px;
+}
+.packs-buttons {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-bottom:20px;
+}
+.packs-buttons button {
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  background:#4c3be6;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:background 0.3s;
+}
+.packs-buttons button:hover {
+  background:#7c3aed;
+}
+
+/* Tableau commandes */
+#ordersTable {
+  width:90%;
+  max-width:1000px;
+  margin-top:20px;
+  border-collapse:collapse;
+  color:#fff;
+}
+#ordersTable th, #ordersTable td {
+  border:1px solid #555;
+  padding:8px;
+  text-align:center;
+}
+#ordersTable th {
+  background:rgba(76,59,230,0.8);
+  color:#fff;
+}
+
+/* Signature */
+.author {
+  position:absolute;
+  bottom:15px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.9rem;
+  color:#a1a1aa;
+  opacity:0.9;
+  z-index:1;
+}
+.author img {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  box-shadow:0 0 10px var(--accent);
+}
+
+/* Curseur personnalisé sans rotation */
+.cursor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+.cursor-overlay img {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Admin Dashboard</h1>
+  <p>Résumé des commandes et statistiques des packs Vues & Snap Score</p>
+</header>
+
+<main>
+  <!-- Statistiques globales -->
+  <div class="stats">
+    <div class="stat-card"><h3>Total Packs</h3><p id="totalPacks">0</p></div>
+    <div class="stat-card"><h3>Total Vues</h3><p id="totalViews">0</p></div>
+    <div class="stat-card"><h3>Total Snap Score</h3><p id="totalSnap">0</p></div>
+    <div class="stat-card"><h3>Revenus total</h3><p id="totalPrice">0$</p></div>
+  </div>
+
+  <!-- Packs Vues -->
+  <div class="packs-section">
+    <h2 style="color:#ffffff;text-shadow:0 0 10px #ffffff;">Packs Vues</h2>
+    <div class="packs-buttons">
+      <button onclick="addPresetPack('10 vues', 10, 0)">10 vues</button>
+      <button onclick="addPresetPack('100 vues', 100, 0.2)">100 vues</button>
+      <button onclick="addPresetPack('250 vues', 250, 0.5)">250 vues</button>
+      <button onclick="addPresetPack('500 vues', 500, 1)">500 vues</button>
+      <button onclick="addPresetPack('1000 vues', 1000, 1.5)">1000 vues</button>
+    </div>
+  </div>
+
+  <!-- Packs Snap Score -->
+  <div class="packs-section">
+    <h2 style="color:#fbff00;text-shadow:0 0 10px #fbff00;">Packs Snap Score</h2>
+    <div class="packs-buttons">
+      <button onclick="addPresetPack('+1k Snap', 0, 0)">+1k</button>
+      <button onclick="addPresetPack('+10k Snap', 0, 0.5)">+10k</button>
+      <button onclick="addPresetPack('+25k Snap', 0, 1)">+25k</button>
+      <button onclick="addPresetPack('+50k Snap', 0, 3)">+50k</button>
+      <button onclick="addPresetPack('+100k Snap', 0, 10)">+100k</button>
+    </div>
+  </div>
+
+  <!-- Tableau des commandes passées -->
+  <h2>Commandes passées</h2>
+  <table id="ordersTable">
+    <thead>
+      <tr>
+        <th>Pack</th>
+        <th>Vues</th>
+        <th>Snap Score</th>
+        <th>Prix</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<div class="author">
+  <span>By 𝐇𝐃𝕀.𝟔𝟗𝕂</span>
+  <img src="Certif.PNG" alt="Certif">
+</div>
+
+<!-- Curseur -->
+<div class="cursor-overlay">
+  <img src="cursor.webp" alt="Curseur personnalisé">
+</div>
+
+<script>
+let totalPacks = 0;
+let totalViews = 0;
+let totalSnap = 0;
+let totalPrice = 0;
+
+// Fonction pour ajouter un pack
+function addPresetPack(name, views, price) {
+  totalPacks++;
+  totalViews += views;
+
+  let snap = 0;
+  if (name.includes('k Snap')) {
+    snap = parseInt(name);
+  }
+
+  totalSnap += snap;
+  totalPrice += price;
+
+  // Mettre à jour stats
+  document.getElementById('totalPacks').textContent = totalPacks;
+  document.getElementById('totalViews').textContent = totalViews;
+  document.getElementById('totalSnap').textContent = totalSnap;
+  document.getElementById('totalPrice').textContent = totalPrice.toFixed(2) + '$';
+
+  // Date actuelle
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  // Ajouter au tableau
+  const tbody = document.querySelector('#ordersTable tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${name}</td><td>${views}</td><td>${snap}</td><td>${price}$</td><td>${dateStr}</td>`;
+  tbody.appendChild(tr);
+}
+
+// Curseur personnalisé
+const cursor = document.querySelector('.cursor-overlay');
+document.addEventListener('mousemove', (e) => {
+  cursor.style.left = `${e.clientX}px`;
+  cursor.style.top = `${e.clientY}px`;
+});
+</script>
+</body>
+</html>
+

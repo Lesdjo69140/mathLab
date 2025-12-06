@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Boost - Packs de vues</title>
+  <style>
+    :root {
+      --accent: #4c3be6;
+      --bg-dark: #0c0c0f;
+      --card-bg: rgba(28,28,36,0.85);
+      --text-light: #e4e4e7;
+      --hover: #7c3aed;
+    }
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+    body {
+      background: url('wallpapersden.com_sung-jin-woo-solo-leveling_3840x2160.jpg') no-repeat center center/cover;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      text-align: center;
+      position: relative;
+      cursor: none; /* cache le curseur natif */
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 0;
+    }
+    h1 {
+      z-index: 1;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+      text-shadow: 0 0 10px var(--accent);
+    }
+    .grid {
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      width: 90%;
+      max-width: 1000px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 25px var(--hover);
+    }
+    .card h2 {
+      color: var(--accent);
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      text-shadow: 0 0 8px var(--accent);
+    }
+    .card p {
+      font-size: 0.95rem;
+      color: #cfd8dc;
+    }
+    .discord-logo {
+      text-align: center;
+      margin-bottom: 10px;
+      z-index: 1;
+      position: relative;
+    }
+    .discord-logo img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .discord-logo img:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 20px var(--accent), 0 0 40px rgba(76,59,230,0.5);
+    }
+    .author {
+      position: absolute;
+      bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #a1a1aa;
+      opacity: 0.9;
+      z-index: 1;
+    }
+    .author img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    /* Curseur personnalisé */
+    .cursor-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-overlay img {
+      width: 100%;
+      height: 100%;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Packs TikTok Boost 🚀</h1>
+  <small style="
+  font-size: 1.1em;
+  position: relative;
+  top: -22px;
+  color: #4c3be6;
+  text-shadow: 0 0 5px #4c3be6,
+               0 0 10px #4c3be6,
+               0 0 20px #4c3be6,
+               0 0 40px #4c3be6;
+">
+    Augmentez votre nombre de vues rapidement et facilement avec nos packs exclusifs ! Si vous voulez encore plus de vues, contactez-moi sur Tiktok: @hdi691400
+</small>
+
+  <div class="grid">
+    <div class="card" onclick="location.href='views10.html'">
+      <h2>10 vues</h2>
+      <p>Free the first time!</p>
+    </div>
+    <div class="card" onclick="location.href='views100.html'">
+      <h2>100 vues</h2>
+      <p>0.2$</p>
+    </div>
+    <div class="card" onclick="location.href='views250.html'">
+      <h2>250 vues</h2>
+      <p>0.5$</p>
+    </div>
+    <div class="card" onclick="location.href='views500.html'">
+      <h2>500 vues</h2>
+      <p>1$</p>
+    </div>
+    <div class="card" onclick="location.href='views1000.html'">
+      <h2>1000 vues</h2>
+      <p>1.5$</p>
+    </div>
+  </div>
+
+  <div class="discord-logo">
+    <a href="https://discord.gg/FnUXHThb" target="_blank">
+      <img src="logo discord.png" alt="Discord">
+    </a>
+  </div>
+
+<div class="author">
+  <span style="
+    color: #ffffff;
+    text-shadow: 0 0 5px #ffffff,
+                 0 0 10px #ffffff,
+                 0 0 20px #ffffff,
+                 0 0 40px #ffffff;
+  ">
+    By 𝐇𝐃𝕀.𝟔𝟗𝕂
+  </span>
+  <img src="Certif.PNG" alt="Certif">
+</div>
+
+<!-- Curseur -->
+<div class="cursor-overlay">
+  <img src="cursor.webp" alt="Curseur personnalisé">
+</div>
+
+<script>
+  const cursor = document.querySelector('.cursor-overlay');
+  document.addEventListener('mousemove', (e) => {
+    cursor.style.left = `${e.clientX}px`;
+    cursor.style.top = `${e.clientY}px`;
+  });
+</script>
+
+</body>
+</html>

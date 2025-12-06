@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('wallpapersden.com_sung-jin-woo-solo-leveling_3840x2160.jpg') no-repeat center center/cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none; /* cacher le curseur natif */
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .signup-box {
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 40px;
+      width: 350px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .signup-box h2 {
+      margin-bottom: 30px;
+    }
+
+    .textbox {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .textbox input {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #fff;
+      width: 100%;
+      margin-left: 10px;
+      font-size: 16px;
+    }
+
+    .textbox img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      background: #2196F3;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #1976D2;
+    }
+
+    .small {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .small a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+
+    .small a:hover {
+      text-decoration: underline;
+    }
+
+    /* Curseur personnalisé */
+    .cursor-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-overlay img {
+      width: 100%;
+      height: 100%;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="signup-box">
+    <h2>Créer un compte</h2>
+
+    <div class="textbox">
+      <img src="icone utilisateur.png" alt="user">
+      <input type="text" placeholder="Nom d'utilisateur">
+    </div>
+
+    <div class="textbox">
+      <img src="gmail_logo_icon.svg" alt="email">
+      <input type="email" placeholder="Adresse e-mail">
+    </div>
+
+    <div class="textbox">
+      <img src="cadenas cione.webp" alt="lock">
+      <input type="password" placeholder="Mot de passe">
+    </div>
+
+    <button class="btn" onclick="goToLogin()">S'inscrire</button>
+
+    <div class="small">
+      Déjà un compte ? <a href="Login.html">Se connecter</a>
+    </div>
+  </div>
+
+  <!-- Curseur -->
+  <div class="cursor-overlay">
+    <img src="cursor.webp" alt="Curseur personnalisé">
+  </div>
+
+  <script>
+    function goToLogin() {
+      alert("Compte créé avec succès !");
+      window.location.href = "Login.html";
+    }
+
+    // Curseur personnalisé
+    const cursor = document.querySelector('.cursor-overlay');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+    });
+  </script>
+</body>
+</html>

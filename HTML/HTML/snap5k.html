@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pack +1k Snap Score - 𝐇𝐃𝕀.𝟔𝟗𝕂</title>
+  <style>
+    :root { --accent: #fffb00; --bg-dark: #0c0c0f; --text-light: #e4e4e7; }
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { 
+      margin: 0; 
+      background: linear-gradient(135deg, #0a0a0f, #1a1a25 60%, #0a0a0f); 
+      color: var(--text-light); 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      text-align: center; 
+      position: relative; 
+      cursor: none; /* Curseur natif caché */
+    }
+    h1 { font-size: 2rem; color: var(--accent); text-shadow: 0 0 10px var(--accent); margin-bottom: 15px; }
+    p { font-size: 1rem; color: #a1a1aa; max-width: 500px; }
+    button { 
+      margin-top: 30px; 
+      background: var(--accent); 
+      color: black; 
+      border: none; 
+      border-radius: 12px; 
+      padding: 14px 30px; 
+      font-weight: bold; 
+      font-size: 1rem; 
+      cursor: pointer; 
+      transition: all 0.3s; 
+      box-shadow: 0 0 12px var(--accent); 
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); }
+    .back { position: absolute; top: 20px; left: 20px; font-size: 0.9rem; color: #9ca3af; text-decoration: none; transition: 0.3s; }
+    .back:hover { color: var(--accent); }
+    .author { position: absolute; bottom: 15px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #a1a1aa; opacity: 0.9; }
+    .author img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .confirmation-img { margin-top: 20px; max-width: 300px; border-radius: 12px; box-shadow: 0 0 15px var(--accent); display: none; }
+
+    /* Curseur personnalisé */
+    .cursor-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 60px;
+      height: 60px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-overlay img {
+      width: 100%;
+      height: 100%;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="snap.html" class="back">← Retour aux packs</a>
+  <h1>Pack +5k Snap Score 🎯</h1>
+  <p>Ce pack te permet d’obtenir <strong>+5 000 Snap Score</strong> rapidement.<br>Idéal pour un bon boost sur ton compte.</p>
+  <button onclick="confirmBoost()">Activer le pack</button>
+
+  <!-- Image de confirmation -->
+  <img src="1 million SnapScore.png" alt="Snapscore HDI.69K" class="confirmation-img" id="confirmationImg">
+
+  <div class="author">
+    <span style="
+      color: #ffffff;
+      text-shadow: 0 0 5px #ffffff,
+                   0 0 10px #ffffff,
+                   0 0 20px #ffffff,
+                   0 0 40px #ffffff;
+    ">
+      By 𝐇𝐃𝕀.𝟔𝟗𝕂
+    </span>
+    <img src="Certif.PNG" alt="Certif">
+  </div>
+
+  <!-- Curseur personnalisé -->
+  <div class="cursor-overlay">
+    <img src="cursor.webp" alt="Curseur personnalisé">
+  </div>
+
+  <script>
+    function confirmBoost() {
+      alert('Ajoute moi sur Snapchat ou rejoins notre serveur Discord pour pouvoir recevoir ta commande ! Je t\'expliquerai en détails les étapes.');
+      document.getElementById('confirmationImg').style.display = 'block';
+      window.location.href = "https://discord.gg/FnUXHThb";
+    }
+
+    // Mouvement du curseur
+    const cursor = document.querySelector('.cursor-overlay');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+    });
+  </script>
+</body>
+</html>

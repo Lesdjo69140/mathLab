@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Live Demo - Math'Lab Improved</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow" />
+
+
+<link rel="stylesheet" href="styles-new.css">
+
+
+<style>
+/* Corps de page */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  overflow-y: scroll;
+}
+
+/* Logo fixe en haut à gauche */
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 999;
+  height: 80px;
+  width: auto;
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+
+/* Navigation dynamique */
+.nav {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 240px;
+  padding: 22px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 12px 0 0 12px;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  color: #edf2f4;
+  transform: translateX(100%);
+  transition: transform 0.4s;
+  z-index: 998;
+}
+
+.nav.show {
+  transform: translateX(0);
+}
+
+/* Boutons internes */
+.btn {
+  padding: 10px 16px;
+  background: #ef233c;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+  background: #d90429;
+  transform: translateY(-3px);
+}
+
+/* Boutons Download Now et Démo */
+.download-btn {
+  position: fixed;
+  left: 20px; /* bouton à gauche */
+  padding: 16px 28px;
+  background-color: #0a2540;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: all 0.3s;
+}
+
+.download-btn:hover {
+  background-color: #061a2b;
+  transform: scale(1.05);
+}
+
+/* Position verticale spécifique pour chaque bouton */
+.download-btn:first-of-type {
+  top: 45%; /* Download Now */
+}
+
+.download-btn:last-of-type {
+  top: 60%; /* Démo */
+}
+
+/* Iframe background scrollable */
+.background-iframe {
+  width: 100%;
+  height: 3000px; /* Ajuste selon besoin */
+  border: none;
+}
+
+</style>
+</head>
+<body>
+
+
+<!-- Logo Math'Lab -->
+<img src="math'lab69140.png" alt="Math'Lab Logo" class="logo">
+
+
+<!-- Bouton Download Now -->
+<a href="https://www.appcreator24.com/app3807990-1oun76" target="_blank" class="download-btn">Download Now</a>
+<a href="Launcher principale.html" class="download-btn">Démo</a>
+
+
+<!-- Iframe utilisé comme background scrollable -->
+<iframe class="background-iframe" src="math'lab691400.png" scrolling="yes"></iframe>
+
+
+<!-- Navigation dynamique -->
+<div id="demo-page-nav" class="nav"></div>
+<div id="demo-page-nav" class="nav">
+    <a href="demo.html" class="btn">Demo</a>
+</div>
+
+
+
+<!-- Scripts inchangés -->
+<script src="jquery-1.11.0.min.js"></script>
+<script src="script-new.js"></script>
+</body>
+</html>
